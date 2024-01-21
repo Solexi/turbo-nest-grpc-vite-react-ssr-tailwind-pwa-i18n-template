@@ -1,20 +1,27 @@
+/* eslint-disable prettier/prettier */
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 //import { CreateUserDto } from './dto/create-user.dto';
 //import { UpdateUserDto } from './dto/update-user.dto';
-import { CreateUserDto, PaginationDto, USERS_SERVICE_NAME, UpdateUserDto, UsersServiceClient } from '@common/hms-lib';
+import {
+  CreateUserDto,
+  PaginationDto,
+  USERS_SERVICE_NAME,
+  UpdateUserDto,
+  UsersServiceClient,
+} from '@common/hms-lib';
 import { IDENTITY_SERVICE } from './constants';
 import { ClientGrpc } from '@nestjs/microservices';
 import { ReplaySubject } from 'rxjs';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
-
   private usersService: UsersServiceClient;
 
-  constructor (@Inject(IDENTITY_SERVICE) private client: ClientGrpc){}
+  constructor(@Inject(IDENTITY_SERVICE) private client: ClientGrpc) {}
 
   onModuleInit() {
-      this.usersService = this.client.getService<UsersServiceClient>(USERS_SERVICE_NAME)
+    this.usersService =
+      this.client.getService<UsersServiceClient>(USERS_SERVICE_NAME);
   }
   create(createUserDto: CreateUserDto) {
     return this.usersService.createUser(createUserDto);
@@ -25,24 +32,24 @@ export class UsersService implements OnModuleInit {
   }
 
   findOne(id: string) {
-    return this.usersService.findOneUser({id});
+    return this.usersService.findOneUser({ id });
   }
 
   update(id: string, updateUserDto: UpdateUserDto) {
-    return this.usersService.updateUser({id, ...updateUserDto});
+    return this.usersService.updateUser({ id, ...updateUserDto });
   }
 
   remove(id: string) {
-    return this.usersService.removeUser({id});
+    return this.usersService.removeUser({ id });
   }
 
-  usePaginatedUsers(){
+  usePaginatedUsers() {
     const users$ = new ReplaySubject<PaginationDto>();
 
-    users$.next({page: 0, skip: 25});
-    users$.next({page: 1, skip: 25});
-    users$.next({page: 2, skip: 25});
-    users$.next({page: 3, skip: 25});
+    users$.next({ page: 0, skip: 25 });
+    users$.next({ page: 1, skip: 25 });
+    users$.next({ page: 2, skip: 25 });
+    users$.next({ page: 3, skip: 25 });
 
     users$.complete();
 
@@ -51,10 +58,12 @@ export class UsersService implements OnModuleInit {
     this.usersService.queryUsers(users$).subscribe((users) => {
       console.log('Chunk', chunkNumber, users);
       chunkNumber += 1;
-    })
+    });
   }
 
-  findOneUserByPrimaryEmailAddress(primaryEmailAddress: string){
-    return this.usersService.findOneUserByPrimaryEmailAddress({primaryEmailAddress});
+  findOneUserByPrimaryEmailAddress(primaryEmailAddress: string) {
+    return this.usersService.findOneUserByPrimaryEmailAddress({
+      primaryEmailAddress,
+    });
   }
 }

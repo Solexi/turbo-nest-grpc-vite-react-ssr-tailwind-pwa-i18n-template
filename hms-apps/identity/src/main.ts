@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
@@ -12,9 +13,9 @@ async function bootstrap() {
       options: {
         url: 'localhost:5000', //defaults to localhost:5000.
         protoPath: join(__dirname, './proto/identity.proto'),
-        package: IDENTITY_PACKAGE_NAME
-      }
-    }
+        package: IDENTITY_PACKAGE_NAME,
+      },
+    },
   );
   await app.listen();
 }
