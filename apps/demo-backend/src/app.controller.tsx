@@ -1,10 +1,18 @@
-import { Controller, Get, Req, Res, VERSION_NEUTRAL, Version } from '@nestjs/common';
+/* eslint-disable prettier/prettier */
+import {
+  Controller,
+  Get,
+  Req,
+  Res,
+  VERSION_NEUTRAL,
+  Version,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 //import React from "react";
-import { renderToPipeableStream } from "react-dom/server";
-import { StaticRouter } from "react-router-dom/server";
+import { renderToPipeableStream } from 'react-dom/server';
+import { StaticRouter } from 'react-router-dom/server';
 //import App from "../../demo-frontend/src/App";
-import AppWithNavDemo from "../../demo-frontend/src/AppWithNavDemo";
+import AppWithNavDemo from '../../demo-frontend/src/AppWithNavDemo';
 //import AppWithNavDemo from "demo-frontend/src/AppWithNavDemo";
 import { Response } from 'express';
 import { initialContentMap as iCM } from './global/backend.settings';
@@ -17,18 +25,17 @@ import { RequestExtended as Request } from './global/app.interfaces';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) { }
+  constructor(private readonly appService: AppService) {}
 
   //Prepare for ssr for this controller from global settings
   //below, feel free to add more data fields as your logic requires, to the initialContentMap below
   //you can also do this at Request level.
-  initialContentMap = { ...iCM, 'title': 'Welcome to demo Hello World!' }
+  initialContentMap = { ...iCM, title: 'Welcome to demo Hello World!' };
 
   //localesRootPath = join(__dirname, '../../../..', 'demo-frontend','dist','locales');
   //initialI18nStore = dirTree(this.localesRootPath);
 
-
-  assetMap = { ...aM, initialContentMap: this.initialContentMap }
+  assetMap = { ...aM, initialContentMap: this.initialContentMap };
   /* //Below could be here but I have centralized the common fields in app.settings.tsx
   initialContentMap = {
     'title': 'Hello World',
@@ -46,19 +53,19 @@ export class AppController {
   };
   */
 
-
   @Get('web*')
-  @Version(VERSION_NEUTRAL)//applies to no version
+  @Version(VERSION_NEUTRAL) //applies to no version
   getHelloWithSsr(@Req() req: Request, @Res() res: Response) {
     let assetMap = {
       ...this.assetMap,
-      baseUrl: "/web",
+      baseUrl: '/web',
       initialContentMap: {
-        ...this.initialContentMap, 'hello-message': this.appService.getHello(),
+        ...this.initialContentMap,
+        'hello-message': this.appService.getHello(),
         initialLanguage: 'en-US',
-        initialI18nStore: {}
-      }
-    } //override the base Url with req route since it could be influenced by version, etc.
+        initialI18nStore: {},
+      },
+    }; //override the base Url with req route since it could be influenced by version, etc.
 
     const entryPoint = [assetMap['main.js']];
 
@@ -67,32 +74,35 @@ export class AppController {
         <AppWithNavDemo assetMap={assetMap} />
       </StaticRouter>,
       {
-        bootstrapScriptContent: `window.assetMap = ${JSON.stringify(assetMap)};`,
+        bootstrapScriptContent: `window.assetMap = ${JSON.stringify(
+          assetMap,
+        )};`,
         //bootstrapScripts: entryPoint,
         bootstrapModules: entryPoint,
         onShellReady() {
           res.statusCode = 200;
-          res.setHeader("Content-type", "text/html");
+          res.setHeader('Content-type', 'text/html');
           pipe(res);
         },
         onShellError() {
           res.statusCode = 500;
-          res.send("<!doctype html><p>Loading...</p>");
+          res.send('<!doctype html><p>Loading...</p>');
         },
-      }
+      },
     );
   }
 
-
   @Get('web*')
-  @Version('1')//applies to v1
+  @Version('1') //applies to v1
   getHelloWithSsrV1(@Req() req: Request, @Res() res: Response) {
     let assetMap = {
       ...this.assetMap,
-      baseUrl: "/v1/web",
-      initialContentMap: { ...this.initialContentMap, 'hello-message': this.appService.getHello() }
-    } //override the base Url with req route since it could be influenced by version, etc.
-
+      baseUrl: '/v1/web',
+      initialContentMap: {
+        ...this.initialContentMap,
+        'hello-message': this.appService.getHello(),
+      },
+    }; //override the base Url with req route since it could be influenced by version, etc.
 
     const entryPoint = [assetMap['main.js']];
 
@@ -101,30 +111,33 @@ export class AppController {
         <AppWithNavDemo assetMap={assetMap} />
       </StaticRouter>,
       {
-        bootstrapScriptContent: `window.assetMap = ${JSON.stringify(assetMap)};`,
+        bootstrapScriptContent: `window.assetMap = ${JSON.stringify(
+          assetMap,
+        )};`,
         //bootstrapScripts: entryPoint,
         bootstrapModules: entryPoint,
         onShellReady() {
           res.statusCode = 200;
-          res.setHeader("Content-type", "text/html");
+          res.setHeader('Content-type', 'text/html');
           pipe(res);
         },
         onShellError() {
           res.statusCode = 500;
-          res.send("<!doctype html><p>Loading...</p>");
+          res.send('<!doctype html><p>Loading...</p>');
         },
-      }
+      },
     );
   }
 
-
   @Get('web*')
-  @Version('2')//applies to v2
+  @Version('2') //applies to v2
   getHelloWithSsrV2(@Req() req: Request, @Res() res: Response) {
     //Let's attempt to get the language of the user's browser, so we can adjust initial translation language
     //console.log(`req.headers["accept-language"] = ${req.headers["accept-language"]}`);
-    const acceptLanguage = acceptLangParser.parse(req.headers["accept-language"]);
-    
+    const acceptLanguage = acceptLangParser.parse(
+      req.headers['accept-language'],
+    );
+
     /*//as per i18n ssr. This style involving middleware is not in use
     //const context = {}; //see https://github.com/i18next/react-i18next/blob/master/example/razzle-ssr/src/server.js#L78
 
@@ -149,16 +162,21 @@ export class AppController {
 
     //update assetMap
     //prepare language region format. Add lead dash (-) to region, if any
-    const clientFirstAcceptLanguageRegion = acceptLanguage[0].region?`-${acceptLanguage[0].region}`:'';
-    const clientFirstAcceptLanguage = `${acceptLanguage[0].code}${clientFirstAcceptLanguageRegion}`
+    const clientFirstAcceptLanguageRegion = acceptLanguage[0].region
+      ? `-${acceptLanguage[0].region}`
+      : '';
+    const clientFirstAcceptLanguage = `${acceptLanguage[0].code}${clientFirstAcceptLanguageRegion}`;
     let assetMap = {
       ...this.assetMap,
-      baseUrl: "/v2/web",//override the base Url with req route since it could be influenced by version, etc.
-      initialContentMap: { ...this.initialContentMap, 'hello-message': this.appService.getHello() },
+      baseUrl: '/v2/web', //override the base Url with req route since it could be influenced by version, etc.
+      initialContentMap: {
+        ...this.initialContentMap,
+        'hello-message': this.appService.getHello(),
+      },
       //initialLanguage: initialLanguage,
       //initialI18nStore: initialI18nStore,
-      clientFirstAcceptLanguage
-    }
+      clientFirstAcceptLanguage,
+    };
 
     const entryPoint = [assetMap['main.js']];
 
@@ -173,36 +191,38 @@ export class AppController {
         <AppWithNavDemo assetMap={assetMap} />
       </StaticRouter>,
       {
-        bootstrapScriptContent: `window.assetMap = ${JSON.stringify(assetMap)};`,
+        bootstrapScriptContent: `window.assetMap = ${JSON.stringify(
+          assetMap,
+        )};`,
         //bootstrapScripts: entryPoint,
         bootstrapModules: entryPoint,
         onShellReady() {
           res.statusCode = 200;
-          res.setHeader("Content-type", "text/html");
+          res.setHeader('Content-type', 'text/html');
           pipe(res);
         },
         onShellError() {
           res.statusCode = 500;
-          res.send("<!doctype html><p>Loading...</p>");
+          res.send('<!doctype html><p>Loading...</p>');
         },
-      }
+      },
     );
   }
 
   @Get('/hello')
   getHello() {
-    return ("Hello World from backend - versionless!");
+    return 'Hello World from backend - versionless!';
   }
 
-  @Version(['1'])//applies to v1
+  @Version(['1']) //applies to v1
   @Get('/hello')
   getHelloV1() {
-    return ("Hello World from backend - version 1!");
+    return 'Hello World from backend - version 1!';
   }
 
-  @Version(['2'])//applies to v2
+  @Version(['2']) //applies to v2
   @Get('/hello')
   getHelloV2() {
-    return ("Hello World from backend - version 2!");
+    return 'Hello World from backend - version 2!';
   }
 }

@@ -4,9 +4,9 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 @Entity()
 export class User {
   @PrimaryGeneratedColumn("uuid")
-  id?: string;
+  id: string;
 
-  @Column({ unique: true })
+  @Column({ length: 50 })
   primaryEmailAddress: string;
 
   @Column()

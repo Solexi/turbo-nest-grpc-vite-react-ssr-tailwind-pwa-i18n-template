@@ -12,27 +12,30 @@ import {
   FindOneUserDto,
   PaginationDto,
   FindOneUserByPrimaryEmailAddressDto,
+  Users,
 } from '@common/hms-lib';
 import { Observable } from 'rxjs';
+import { User } from './entities/user.entity';
 
 @Controller()
 @UsersServiceControllerMethods()
 export class UsersController implements UsersServiceController {
   constructor(private readonly usersService: UsersService) { }
 
-  createUser(createUserDto: CreateUserDto) {
+  createUser(createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.create(createUserDto);
   }
 
-  findAllUsers() {
-    return this.usersService.findAll();
+  async findAllUsers(): Promise<Users> {
+    const users = await this.usersService.findAll();
+    return { users }; // Assuming 'users' is the property expected by the interface
   }
 
-  findOneUser(findOneUserDto: FindOneUserDto) {
+  findOneUser(findOneUserDto: FindOneUserDto): Promise<User>{
     return this.usersService.findOne(findOneUserDto.id);
   }
 
-  updateUser(updateUserDto: UpdateUserDto) {
+  updateUser(updateUserDto: UpdateUserDto): Promise<User>{
     return this.usersService.update(updateUserDto.id, updateUserDto);
   }
 
@@ -40,13 +43,13 @@ export class UsersController implements UsersServiceController {
     return this.usersService.remove(findOneUserDto.id);
   }
 
-  queryUsers(paginationDtoStream: Observable<PaginationDto>) {
+  queryUsers(paginationDtoStream: Observable<PaginationDto>): Observable<Users> {
     return this.usersService.queryUsers(paginationDtoStream);
   }
 
   findOneUserByPrimaryEmailAddress(
     findOneUserByPrimaryEmailAddressDto: FindOneUserByPrimaryEmailAddressDto,
-  ) {
+  ): Promise<User> {
     return this.usersService.findOneUserByPrimaryEmailAddress(
       findOneUserByPrimaryEmailAddressDto.primaryEmailAddress,
     );

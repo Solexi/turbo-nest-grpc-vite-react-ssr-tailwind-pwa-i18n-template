@@ -15,7 +15,7 @@ import { User } from './entities/user.entity';
 // export class UsersService implements OnModuleInit{
 export class UsersService {
   //static user data for demo purpose only
-  // private readonly users:User[] = [];
+  private readonly users:User[] = [];
   constructor(@InjectRepository(User) private readonly userRepository: Repository<User>){}
 
   // onModuleInit() {
